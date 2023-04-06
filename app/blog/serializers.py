@@ -13,7 +13,7 @@ class BlogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Blog
-        fields = ['id', 'author__name', 'title', 'category', 'date_created']
+        fields = ['id', 'author', 'title', 'category', 'date_created']
         read_only_fields = ['id']
 
     def create(self, validated_data):

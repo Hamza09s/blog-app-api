@@ -31,9 +31,10 @@ class BlogViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """Retrieve blogs for authenticated user."""
         queryset = self.queryset
-        return queryset.filter(
-            user=self.request.user
-        ).order_by('-id')
+        return queryset.order_by('-id')
+        # return queryset.filter(
+        #     user=self.request.user
+        # ).order_by('-id')
         # we get user by request from the authentication system
         # as we know user is authenticated
         # so we can filter recipe for the user that is authenticated
