@@ -53,14 +53,18 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Blog(models.Model):
     """Blog object."""
-    author = models.ForeignKey(
+    user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
     )
     title = models.CharField(max_length=255)
     category = models.CharField(max_length=255)
     date_created = models.DateTimeField(auto_now_add=True)
-    description = models.TextField(blank=True)
+    content = models.TextField(blank=True)
+
+    @property
+    def author(self):
+        return self.user.name
 
     def __str__(self):
         return self.title
