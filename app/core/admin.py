@@ -48,3 +48,4 @@ class UserAdmin(BaseUserAdmin):
 admin.site.register(models.User, UserAdmin)
 # if you don't specify here to use our custom UserAdmin
 # #it wll use its own default user admin
+admin.site.register(models.Blog)
