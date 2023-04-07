@@ -61,6 +61,7 @@ class Blog(models.Model):
     category = models.CharField(max_length=255)
     date_created = models.DateTimeField(auto_now_add=True)
     content = models.TextField(blank=True)
+    likes = models.ManyToManyField(User, related_name='liked_blogs')
 
     @property
     def author(self):
@@ -70,12 +71,31 @@ class Blog(models.Model):
         return self.title
 
 
-class Likes(models.Model):
+class Like(models.Model):
     """For liking a blog."""
+    post = models.ForeignKey(Blog, on_delete=models.CASCADE)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
     )
 
+    class Meta:
+        unique_together = ('post', 'user')
+
     def __str__(self):
-        return self.name
+        return f'{self.user.username} likes {self.post.title}'
+
+
+class Comment(models.Model):
+    """For commenting on a blog."""
+
+    post = models.ForeignKey(
+        Blog, on_delete=models.CASCADE, related_name='comments')
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+    text = models.TextField(blank=True)
+
+    def __str__(self):
+        return f'{self.author.username} commented "{self.text}" on {self.post.title}'
