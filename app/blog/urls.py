@@ -12,13 +12,17 @@ from blog import views
 
 
 router = DefaultRouter()
-router.register('blogs', views.BlogViewSet)
+router.register("blogs", views.BlogViewSet)
+# router.register("likes", views.LikeViewSet)
+# router.register("comments", views.CommentViewSet)
+# router.register('get_likes', views.NewLikeViewSet)
+# router.register('Post', views.PostViewSet)
 # create endpoints,all available crud methods and register endpoints
 # for them
 
 
-app_name = 'blog'
+app_name = "blog"
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path("", include(router.urls)),
 ]

@@ -20,7 +20,7 @@ class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         """Create, save and return a new user."""
         if not email:
-            raise ValueError('User must have email address')
+            raise ValueError("User must have email address")
 
         user = self.model(email=self.normalize_email(email), **extra_fields)
         user.set_password(password)
@@ -41,6 +41,7 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     """User in the system."""
+
     email = models.EmailField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
@@ -48,11 +49,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
 
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = "email"
 
 
 class Blog(models.Model):
     """Blog object."""
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -61,7 +63,12 @@ class Blog(models.Model):
     category = models.CharField(max_length=255)
     date_created = models.DateTimeField(auto_now_add=True)
     content = models.TextField(blank=True)
-    likes = models.ManyToManyField(User, related_name='liked_blogs')
+    likes = models.ManyToManyField(
+        "Like",
+        related_name="likes",
+        default=None,
+    )
+    comments = models.ManyToManyField("Comment")
 
     @property
     def author(self):
@@ -73,29 +80,40 @@ class Blog(models.Model):
 
 class Like(models.Model):
     """For liking a blog."""
-    post = models.ForeignKey(Blog, on_delete=models.CASCADE)
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-    )
 
-    class Meta:
-        unique_together = ('post', 'user')
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=None, null=True
+    )
+    blog = models.ForeignKey(Blog, on_delete=models.CASCADE, default=None, null=True)
+    the_like = models.CharField(max_length=255, default=None, null=True)
+
+    @property
+    def author(self):
+        return self.user.name
 
     def __str__(self):
-        return f'{self.user.username} likes {self.post.title}'
+        return f"liked"
 
 
 class Comment(models.Model):
     """For commenting on a blog."""
 
-    post = models.ForeignKey(
-        Blog, on_delete=models.CASCADE, related_name='comments')
-    author = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=None, null=True
     )
     text = models.TextField(blank=True)
 
+    @property
+    def author(self):
+        return self.user.name
+
     def __str__(self):
-        return f'{self.author.username} commented "{self.text}" on {self.post.title}'
+        return f"commented"
+
+
+# class Post(models.Model):
+#     user = models.ForeignKey(
+#         settings.AUTH_USER_MODEL,
+#         on_delete=models.CASCADE, default=None, null=True
+#     )
+#     current_count = models.PositiveIntegerField(default=0)
